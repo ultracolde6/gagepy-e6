@@ -600,12 +600,16 @@ class DllContainer(object):
 
 	
 # Callback Function Type
-if sys_plat == "win32":
-	func_type = ct.WINFUNCTYPE
-else:
-	# Untested!
-	print('Untested callback type!')
-	func_type = ct.CFUNCTYPE
+# if sys_plat == "win32":
+# 	func_type = ct.WINFUNCTYPE
+# else:
+# 	# Untested!
+# 	print('Untested callback type!')
+# 	func_type = ct.CFUNCTYPE
+
+#  BUG: func_type = ct.WINFUNCTYPE above causes python to crash - Justin 20200810
+print('Untested callback type!')
+func_type = ct.CFUNCTYPE
 
 callbackFuncType = func_type(None, ct.c_void_p)
 

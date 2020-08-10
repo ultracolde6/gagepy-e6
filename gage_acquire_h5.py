@@ -40,6 +40,7 @@ except Exception as e:
 	print('Failed to initialize GageScope API: ', e)
 
 sample_clk = 80e6
+ext_clk = 0e6
 carrier_freq = 10e6
 
 trigger_config = (csapi.TriggerSource.EXT, csapi.Coupling.DC, csapi.Impedance.Z_1M, csapi.Gain.G_10Vpp)
@@ -59,7 +60,7 @@ odt.filter = DecimateFilter(10, max_length=200e3)
 odt.pen = ( pg.mkPen('y', width=1), pg.mkPen('r', width=1) )
 
 channel_config = (
-	heterodyne,vco,	odt
+	heterodyne,vco
 )
 
 class GageDummy(object):
@@ -522,8 +523,8 @@ class GageWindow(QtWidgets.QMainWindow):
 	def _gage_configure(self):
 		self.gage.SetAcquisition(
 			sample_rate = int(sample_clk),
-			extclk = int(sample_clk),
-			mode = csapi.Mode.QUAD,
+			extclk = int(ext_clk),
+			mode = csapi.Mode.DUAL,
 			segment_count = 1,
 			depth = self.sample_depth,
 			trigger_timeout = -1, # Set to CS_TIMEOUT_DISABLE=-1
@@ -617,7 +618,7 @@ class GageWindow(QtWidgets.QMainWindow):
 		log('Start plotting', 6)
 		
 		for cid, widget in self.channel_widgets.items():
-			if not plot_data.has_key(cid):
+			if cid not in plot_data:
 				continue
 				
 			filt_time, filt_data = plot_data[cid]
