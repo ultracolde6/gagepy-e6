@@ -31,21 +31,21 @@ path.commonpath = commonpath
 ## configuration
 ####################
 
-dataRoot = 'E:\\Data\\'
-analysisRoot = 'E:\\Analysis\\'
+dataRoot = 'Y:\\expdata-e6\\data\\'
+analysisRoot = 'Y:\\expdata-e6\\data\\'
 
 try:
 	csapi.Initialize()
 except Exception as e:
 	print('Failed to initialize GageScope API: ', e)
 
-sample_clk = 80e6
-ext_clk = 0e6
-carrier_freq = 10e6
+sample_clk = 200e6
+ext_clk = 200e6
+carrier_freq = 15e6
 
 trigger_config = (csapi.TriggerSource.EXT, csapi.Coupling.DC, csapi.Impedance.Z_1M, csapi.Gain.G_10Vpp)
 
-heterodyne = ChannelConfig(1, csapi.Coupling.DC, csapi.Impedance.Z_1M, csapi.Gain.G_4Vpp, name='Heterodyne')
+heterodyne = ChannelConfig(1, csapi.Coupling.DC, csapi.Impedance.Z_50, csapi.Gain.G_4Vpp, name='Heterodyne')
 heterodyne.filter = HeterodyneFilter(carrier_freq, bw=20e3, max_length=200e3)
 heterodyne.pen = ( pg.mkPen('b', width=1), pg.mkPen('r', width=1) )
 

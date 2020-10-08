@@ -430,7 +430,7 @@ class RunWidget(QtWidgets.QWidget):
 		self.analysis_root = analysis_root
 		self.mode = mode
 		
-		self.cur_file = 1
+		self.cur_file = 0
 		self.running = False
 		
 		self.setupUi()
@@ -442,7 +442,7 @@ class RunWidget(QtWidgets.QWidget):
 		self.run_name = QtWidgets.QLineEdit('run1')
 		
 		self.run_file = QtWidgets.QSpinBox()
-		self.run_file.setMinimum(1)
+		self.run_file.setMinimum(0)
 		self.run_file.setMaximum(10000)
 		self.run_file.setValue(self.cur_file)
 		
@@ -522,7 +522,7 @@ class RunWidget(QtWidgets.QWidget):
 			today = datetime.date.today()
 			self.run_date.setText('{:%Y\\%b\\%d}'.format(today))
 			
-			self.cur_file = 1
+			self.cur_file = 0
 			self.run_file.setValue(self.cur_file)
 			
 			self.start_button.setText('Start')
@@ -547,7 +547,7 @@ class RunWidget(QtWidgets.QWidget):
 	def getTargetH5(self):
 		date = self.run_date.text()
 		runname = self.run_name.text()
-		runPath = "{runname:s}_gs".format(runname=runname)
+		runPath = "{runname:s}\gagescope".format(runname=runname)
 		targetPath = path.join(self.data_root, str(date), runPath)
 	
 		filename = 'iteration{file:05d}.h5'.format(file=self.cur_file)

@@ -307,7 +307,7 @@ class GageIteration(object):
 				for idx,values in enumerate(self.triggers):
 					prefix, timeout = values
 					
-					if not self.captures.has_key(idx):
+					if idx not in self.captures:
 						continue
 						
 					capture = self.captures[idx]
