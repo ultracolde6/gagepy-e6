@@ -438,7 +438,7 @@ class RunWidget(QtWidgets.QWidget):
 	def setupUi(self):
 		
 		today = datetime.date.today()
-		self.run_date = QtWidgets.QLineEdit('{date:%Y\\%m%b\\%d}'.format(date=today))
+		self.run_date = QtWidgets.QLineEdit('{date:%Y\\%m\\%d}'.format(date=today))
 		self.run_name = QtWidgets.QLineEdit('run1')
 		
 		self.run_file = QtWidgets.QSpinBox()
@@ -449,7 +449,7 @@ class RunWidget(QtWidgets.QWidget):
 		self.start_button = QtWidgets.QPushButton('Start')
 		self.start_button.setCheckable(True)
 		self.start_button.setChecked(self.running)
-		
+		verticalLayout = QtWidgets.QVBoxLayout()
 		layout = QtWidgets.QHBoxLayout()
 
 		layout.addWidget(QtWidgets.QLabel('Data root:'))
@@ -461,10 +461,18 @@ class RunWidget(QtWidgets.QWidget):
 		layout.addWidget(QtWidgets.QLabel('File number:'))
 		layout.addWidget(self.run_file)
 		layout.addWidget(self.start_button)
-		
+
+		verticalLayout.addLayout(layout)
+		self.file_label = QtWidgets.QLabel('Next File Path:')
+		verticalLayout.addWidget(self.file_label)
+		self.update_text()
+		self.run_date.editingFinished.connect(self.update_text)
+		self.run_name.editingFinished.connect(self.update_text)
+		self.run_file.valueChanged.connect(self.update_text)
+
 		self.start_button.clicked.connect(self.toggle)
 		
-		self.setLayout(layout)
+		self.setLayout(verticalLayout)
 		
 		self.incremented.connect(self.update_file)
 		
@@ -543,13 +551,17 @@ class RunWidget(QtWidgets.QWidget):
 		filename = 'AS_CH{channel:02d}-{file:05d}.sig'.format(channel=channel, file=self.cur_file)
 		
 		return filename, targetPath
-		
+
 	def getTargetH5(self):
 		date = self.run_date.text()
 		runname = self.run_name.text()
-		runPath = "{runname:s}\gagescope".format(runname=runname)
-		targetPath = path.join(self.data_root, str(date), runPath)
+		runPath = "{runname:s}".format(runname=runname)
+		targetPath = path.join(self.data_root, str(date), 'data', runPath, 'gagescope')
 	
-		filename = 'iteration{file:05d}.h5'.format(file=self.cur_file)
+		filename = 'iteration_{file:05d}.h5'.format(file=self.cur_file)
 		
 		return filename, targetPath
+
+	def update_text(self):
+		filename, targetPath = self.getTargetH5()
+		self.file_label.setText(f'Next File Name: {path.join(targetPath, filename)}')
