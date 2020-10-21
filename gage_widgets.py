@@ -528,7 +528,7 @@ class RunWidget(QtWidgets.QWidget):
 			self.run_file.setEnabled(True)
 			
 			today = datetime.date.today()
-			self.run_date.setText('{:%Y\\%b\\%d}'.format(today))
+			self.run_date.setText('{:%Y\\%m\\%d}'.format(today))
 			
 			self.cur_file = 0
 			self.run_file.setValue(self.cur_file)
