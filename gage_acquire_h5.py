@@ -79,6 +79,7 @@ class GageDummy(object):
 # TODO add out of range warnings!
 
 
+# noinspection PyAttributeOutsideInit,PyPep8Naming
 class GageWindow(QtWidgets.QMainWindow):
     gage = None
 
@@ -362,6 +363,7 @@ class GageWindow(QtWidgets.QMainWindow):
 
         self.mode_menu = main_menu.addMenu("&Mode")
         mode_group = QtWidgets.QActionGroup(self)
+        action = None
         for item in mode_items:
             (name, shortcut, tip, slot) = item
             action = QtWidgets.QAction(name, self)
@@ -453,7 +455,7 @@ class GageWindow(QtWidgets.QMainWindow):
             self.triggers_changed.emit(self.triggers)
 
     @SlotHandler
-    def toggleStart(self, checked):
+    def toggleStart(self):
         if self.start_button.isChecked():
             self.start_button.setText('Starting...')
 
@@ -540,14 +542,14 @@ class GageWindow(QtWidgets.QMainWindow):
                                  input_range=channel.range,  # in [mV]
                                  )
 
-        (source, coupling, imped, range) = trigger_config
+        (source, coupling, imped, trigger_range) = trigger_config
         self.gage.SetTrigger(
             condition=1,  # Rising slope
-            ext_trigger_range=range,  # Vpp range in [mV]
+            ext_trigger_range=trigger_range,  # Vpp range in [mV]
             ext_impedance=imped,  # in Ohms
             ext_coupling=coupling,  # DC coupling
             source=source,
-            level=30  # Percentage of range/2
+            level=30  # Percentage of trigger_range/2
         )
 
         self.gage.Commit()
@@ -576,7 +578,7 @@ class GageWindow(QtWidgets.QMainWindow):
                 action.setEnabled(False)
 
     @SlotHandler
-    def edit_triggers(self, checked):
+    def edit_triggers(self):
         dialog = TriggerDialog(self.triggers, parent=self)
 
         def save_triggers():
@@ -596,7 +598,7 @@ class GageWindow(QtWidgets.QMainWindow):
             log('Run ''{}'' stopped'.format(runname))
             self.start_button.setEnabled(True)
 
-    def on_acquired(self, cbInfo):
+    def on_acquired(self):
         timestamp = datetime.datetime.now()
 
         if not self._acquiring:

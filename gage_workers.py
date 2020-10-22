@@ -23,6 +23,10 @@ class GageCapture(object):
         self.data = {}
         self.channel_rate = {}
 
+        self.info = None
+        self.acquisition = None
+        self.trigger = None
+
     def __del__(self):
         log('GageCapture Deleted', 7)
 
@@ -47,6 +51,7 @@ class GageCapture(object):
                 self.data[cid] = e3decimate(self.data[cid], resample_dec, n=6).astype(np.int16)
                 self.channel_rate[cid] = sample_rate / resample_dec
 
+    # noinspection PyPep8Naming
     def prepare_plot(self):
 
         plot_data = {}
@@ -64,6 +69,7 @@ class GageCapture(object):
 
         return plot_data
 
+    # noinspection PyTypeChecker
     def save_channel_sig(self, filename, cid):
 
         pack_date, pack_time = self.pack_timestamp(self.timestamp)
@@ -187,7 +193,7 @@ class GageIteration(object):
             # initialized with the last_trigger
             next_iteration = GageIteration(self.triggers, last_trigger=self.last_trigger)
 
-        return (detected_trigger, next_iteration)
+        return detected_trigger, next_iteration
 
     def check_trigger(self, expected_trigger, timestamp, tolerance=2):
 
@@ -314,9 +320,13 @@ class GageIteration(object):
                     capture = self.captures[idx]
                     acquisition = capture.acquisition
 
-                    field_name = lambda prefix, name: "{}_{}".format(prefix, name) if len(prefix) > 0 else name
+                    def get_field_name(field_prefix, field_name):
+                        if len(field_prefix > 0):
+                            return "{}_{}".format(field_prefix, field_name)
+                        else:
+                            return field_name
 
-                    ts_att = field_name(prefix, 'timestamp')
+                    ts_att = get_field_name(prefix, 'timestamp')
                     hf.attrs[ts_att] = capture.timestamp.isoformat()
 
                     segments = capture.channel_config[cid].segments
@@ -328,7 +338,7 @@ class GageIteration(object):
                         x0 = imin * dx
                         seg_data = capture.data[cid][imin:imax]
 
-                        dataset_name = field_name(prefix, name)
+                        dataset_name = get_field_name(prefix, name)
                         dset = hg.create_dataset(dataset_name, data=seg_data)
                         dset.attrs['x0'] = x0
                         dset.attrs['dx'] = dx
@@ -389,6 +399,7 @@ class GageSegWorker(GageWorker):
 
         self.run_widget = run_widget
         self.iteration = GageIteration(triggers)
+        self.trigger_timer = None
 
     def started(self):
         self.trigger_timer = QtCore.QTimer()
