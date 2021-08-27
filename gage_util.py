@@ -105,7 +105,24 @@ class DecimateFilter(DisplayFilter):
 		dec_t = t[::nDec]
 		return (dec_t, filtered)
 
-		
+
+class PhotonCounter(DisplayFilter):
+
+	def __init__(self, dec, max_length=None):
+		self.dec = dec
+
+		self.max_length = max_length
+
+	def apply(self, sample_rate, t, data):
+		nDec = self.dec
+		if self.max_length is not None:
+			nDec = max(nDec, int(math.ceil(len(t) / self.max_length)))
+
+		filtered = e3decimate(data, nDec, n=2)
+		dec_t = t[::nDec]
+		return (dec_t, filtered)
+
+
 class ChannelConfig(object):
 	def __init__(self, id, coupling, impedance, range, resample=None, name=None, filter=None, pen=None):
 		self.id = id

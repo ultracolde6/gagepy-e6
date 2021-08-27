@@ -439,7 +439,7 @@ class RunWidget(QtWidgets.QWidget):
 		
 		today = datetime.date.today()
 		self.run_date = QtWidgets.QLineEdit('{date:%Y\\%m\\%d}'.format(date=today))
-		self.run_name = QtWidgets.QLineEdit('run1')
+		self.run_name = QtWidgets.QLineEdit('run0')
 		
 		self.run_file = QtWidgets.QSpinBox()
 		self.run_file.setMinimum(0)

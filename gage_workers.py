@@ -321,7 +321,7 @@ class GageIteration(object):
                     acquisition = capture.acquisition
 
                     def get_field_name(field_prefix, field_name):
-                        if len(field_prefix > 0):
+                        if len(field_prefix) > 0:
                             return "{}_{}".format(field_prefix, field_name)
                         else:
                             return field_name

@@ -57,10 +57,10 @@ vco.filter = DecimateFilter(10, max_length=200e3)
 # vco.pen = pg.mkPen('g', width=1)
 vco.pen = (pg.mkPen('g', width=1), pg.mkPen('r', width=1))
 
-odt = ChannelConfig(3, csapi.Coupling.DC, csapi.Impedance.Z_1M, csapi.Gain.G_2Vpp, resample=2e6, name='ODT')
-odt.filter = DecimateFilter(10, max_length=200e3)
-# odt.pen = pg.mkPen('y', width=1)
-odt.pen = (pg.mkPen('y', width=1), pg.mkPen('r', width=1))
+# odt = ChannelConfig(3, csapi.Coupling.DC, csapi.Impedance.Z_1M, csapi.Gain.G_2Vpp, resample=2e6, name='ODT')
+# odt.filter = DecimateFilter(10, max_length=200e3)
+# # odt.pen = pg.mkPen('y', width=1)
+# odt.pen = (pg.mkPen('y', width=1), pg.mkPen('r', width=1))
 
 channel_config = (heterodyne, vco)
 
