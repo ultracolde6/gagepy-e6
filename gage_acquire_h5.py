@@ -43,7 +43,7 @@ except Exception as err:
     print('Failed to initialize GageScope API: ', err)
 
 sample_clk = 200e6
-ext_clk = 200e6
+ext_clk = 0 #200e6
 carrier_freq = 15e6
 
 trigger_config = (csapi.TriggerSource.EXT, csapi.Coupling.DC, csapi.Impedance.Z_1M, csapi.Gain.G_10Vpp)
@@ -455,7 +455,7 @@ class GageWindow(QtWidgets.QMainWindow):
             self.triggers_changed.emit(self.triggers)
 
     @SlotHandler
-    def toggleStart(self):
+    def toggleStart(self,*args):
         if self.start_button.isChecked():
             self.start_button.setText('Starting...')
 
@@ -578,7 +578,7 @@ class GageWindow(QtWidgets.QMainWindow):
                 action.setEnabled(False)
 
     @SlotHandler
-    def edit_triggers(self):
+    def edit_triggers(self,*args):
         dialog = TriggerDialog(self.triggers, parent=self)
 
         def save_triggers():
@@ -598,9 +598,9 @@ class GageWindow(QtWidgets.QMainWindow):
             log('Run ''{}'' stopped'.format(runname))
             self.start_button.setEnabled(True)
 
-    def on_acquired(self):
+    def on_acquired(self,*args):
         timestamp = datetime.datetime.now()
-
+        print('on_acquired')
         if not self._acquiring:
             return
 

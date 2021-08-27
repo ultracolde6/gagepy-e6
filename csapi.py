@@ -487,6 +487,7 @@ class DllContainer(object):
 
 		if dlltype is None:
 			dlltype = ct.WinDLL if hasattr(ct, "WinDLL") else ct.CDLL
+			# dlltype = ct.CDLL
 	
 
 		self.dll = None
@@ -599,7 +600,7 @@ class DllContainer(object):
 		
 
 	
-# Callback Function Type
+# # Callback Function Type
 # if sys_plat == "win32":
 # 	func_type = ct.WINFUNCTYPE
 # else:
@@ -831,7 +832,7 @@ class System(object):
 		self.callback_c[event] = cb_c
 		res = dll.CsRegisterCallbackFnc(self._handle, int(event), cb_c)
 		checkerror(res)
-		
+
 	def GetEventHandle(self, event):
 		pEvent = ct.c_void_p()
 		res = dll.CsGetEventHandle(self._handle, int(event), pEvent)
