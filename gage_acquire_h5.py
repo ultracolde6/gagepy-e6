@@ -12,7 +12,7 @@ import pyqtgraph as pg
 import csapi
 from gage_widgets import ChannelWidget, SlotHandler, TriggerDialog, RunWidget
 import gage_util
-from gage_util import GageMode, GageState, ChannelConfig, HeterodyneFilter, DecimateFilter, get_script_path, log
+from gage_util import GageMode, GageState, ChannelConfig, HeterodyneFilter, DecimateFilter, PeakIntegralFilter, get_script_path, log
 from gage_workers import GageCapture, GageSegWorker, GageTradWorker
 
 gage_util.print_level = 2
@@ -52,17 +52,25 @@ heterodyne = ChannelConfig(1, csapi.Coupling.DC, csapi.Impedance.Z_50, csapi.Gai
 heterodyne.filter = HeterodyneFilter(carrier_freq, bw=20e3, max_length=200e3)
 heterodyne.pen = (pg.mkPen('b', width=1), pg.mkPen('r', width=1))
 
-vco = ChannelConfig(2, csapi.Coupling.DC, csapi.Impedance.Z_1M, csapi.Gain.G_2Vpp, resample=2e6, name='VCO')
-vco.filter = DecimateFilter(10, max_length=200e3)
+spcm = ChannelConfig(2, csapi.Coupling.DC, csapi.Impedance.Z_50, csapi.Gain.G_1Vpp, name='SPCM')
+# spcm.filter = DecimateFilter(10, max_length=200e3)
+spcm.filter = PeakIntegralFilter(0.045, 5, max_length=200e3)
+# 0.045 is the optimized peak height threshold
 # vco.pen = pg.mkPen('g', width=1)
-vco.pen = (pg.mkPen('g', width=1), pg.mkPen('r', width=1))
+spcm.pen = (pg.mkPen('g', width=1), pg.mkPen('b', width=1), pg.mkPen('w', width=1), pg.mkPen('r', width=1))
+
+
+# vco = ChannelConfig(2, csapi.Coupling.DC, csapi.Impedance.Z_1M, csapi.Gain.G_2Vpp, resample=2e6, name='VCO')
+# vco.filter = DecimateFilter(10, max_length=200e3)
+# # vco.pen = pg.mkPen('g', width=1)
+# vco.pen = (pg.mkPen('g', width=1), pg.mkPen('r', width=1))
 
 # odt = ChannelConfig(3, csapi.Coupling.DC, csapi.Impedance.Z_1M, csapi.Gain.G_2Vpp, resample=2e6, name='ODT')
 # odt.filter = DecimateFilter(10, max_length=200e3)
 # # odt.pen = pg.mkPen('y', width=1)
 # odt.pen = (pg.mkPen('y', width=1), pg.mkPen('r', width=1))
 
-channel_config = (heterodyne, vco)
+channel_config = ([spcm])
 
 
 class GageDummy(object):
@@ -455,7 +463,7 @@ class GageWindow(QtWidgets.QMainWindow):
             self.triggers_changed.emit(self.triggers)
 
     @SlotHandler
-    def toggleStart(self,*args):
+    def toggleStart(self,checked):
         if self.start_button.isChecked():
             self.start_button.setText('Starting...')
 
@@ -578,7 +586,7 @@ class GageWindow(QtWidgets.QMainWindow):
                 action.setEnabled(False)
 
     @SlotHandler
-    def edit_triggers(self,*args):
+    def edit_triggers(self,checked):
         dialog = TriggerDialog(self.triggers, parent=self)
 
         def save_triggers():
@@ -598,7 +606,7 @@ class GageWindow(QtWidgets.QMainWindow):
             log('Run ''{}'' stopped'.format(runname))
             self.start_button.setEnabled(True)
 
-    def on_acquired(self,*args):
+    def on_acquired(self,cbInfo):
         timestamp = datetime.datetime.now()
         print('on_acquired')
         if not self._acquiring:

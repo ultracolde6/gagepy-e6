@@ -65,7 +65,7 @@ class GageCapture(object):
 
             t = np.arange(len(scaled_data), dtype=np.double) / self.channel_rate[cid]
             filt_time, filt_data = config.filter.apply(self.channel_rate[cid], t, scaled_data)
-            plot_data[cid] = (filt_time, filt_data)
+            plot_data[cid] = (filt_time, filt_data) #plotting the filterred data
 
         return plot_data
 
@@ -195,7 +195,7 @@ class GageIteration(object):
 
         return detected_trigger, next_iteration
 
-    def check_trigger(self, expected_trigger, timestamp, tolerance=2):
+    def check_trigger(self, expected_trigger, timestamp, tolerance=0.4):
 
         if not self.last_trigger:
             # First trigger received
@@ -244,7 +244,7 @@ class GageIteration(object):
             self.last_trigger = timestamp
             return expected_trigger
 
-    def check_timeout(self, tolerance=2):
+    def check_timeout(self, tolerance=0.4):
         if not self.last_trigger or self.cur_trigger >= len(self.triggers):
             return None
 
@@ -259,7 +259,7 @@ class GageIteration(object):
         while (now - expected_timestamp).total_seconds() > tolerance:
             # If expected trigger is passed
 
-            log('Missed trigger #{} at {}!'.format(self.cur_trigger, now))
+            log('Missed trigger {} at {}!'.format(self.cur_trigger, now))
             self.last_trigger = expected_timestamp
             self.cur_trigger = self.cur_trigger + 1
 
@@ -272,7 +272,7 @@ class GageIteration(object):
 
         return None
 
-    def get_trigger_timeout(self, tolerance=2):
+    def get_trigger_timeout(self, tolerance=0.2):
         if not self.last_trigger or self.cur_trigger >= len(self.triggers):
             return 0
 

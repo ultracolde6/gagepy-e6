@@ -88,19 +88,44 @@ class HeterodyneFilter(DisplayFilter):
 		
 		return (dec_t, hetMag)
 
-		
+
+class PeakIntegralFilter(DisplayFilter):
+
+	def __init__(self, threshold, width, max_length=None):
+		self.threshold = threshold
+		self.width = width
+
+		self.max_length = max_length
+
+	def apply(self, sample_rate, t, data):
+		threshold = self.threshold
+		width = self.width
+
+		peaks, _ = signal.find_peaks(data, height=threshold, distance=width, width=width)
+		num_total = len(peaks)
+		print(f"total photon number = {num_total}")
+		# t_arrivals = np.concatenate(([0],t[peaks],[t[-1]]), axis=None)
+		# num_count = np.concatenate((np.arange(num_total+1),[num_total]), axis=None)
+		if np.mean(data)>500:
+			print('SPCM saturated!!! Turn down the power!')
+		temp_x = t[peaks]
+		t_arrivals = np.concatenate(([0],np.stack((temp_x - 1e-9, temp_x)).flatten('F'),[t[-1]]), axis=None)
+		temp_y = np.arange(num_total+1)
+		num_count = np.stack((temp_y, temp_y)).flatten('F')
+		return (t_arrivals, num_count)
+
 class DecimateFilter(DisplayFilter):
-	
+
 	def __init__(self, dec, max_length=None):
 		self.dec = dec
-	
+
 		self.max_length = max_length
-		
+
 	def apply(self, sample_rate, t, data):
 		nDec = self.dec
 		if self.max_length is not None:
 			nDec = max(nDec, int(math.ceil(len(t) / self.max_length)))
-		
+
 		filtered = e3decimate(data, nDec, n=2)
 		dec_t = t[::nDec]
 		return (dec_t, filtered)
